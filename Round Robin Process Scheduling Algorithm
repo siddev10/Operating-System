@@ -1,0 +1,153 @@
+#include<stdio.h>
+struct process {
+    int pid;
+    int at;
+    int bt;  
+    int tbt; 
+    int ct;  
+    int tat; 
+    int wt;  
+    int rt;  
+};
+
+int main() {
+    int n, tq;
+    
+    printf("Enter the no. of processes:\n");
+    scanf("%d", &n);
+    
+    struct process p[n];
+    
+    printf("Enter the time quantum:\n");
+    scanf("%d", &tq);
+    
+    printf("Enter the id of the process:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &p[i].pid);
+    }
+    
+    printf("Enter the arrival time of the process:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &p[i].at);
+    }
+    
+    printf("Enter the burst time of the process:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &p[i].bt);
+        p[i].rt = p[i].bt;  
+        p[i].tbt = p[i].bt; 
+    }
+    
+    int completed = 0;      
+    int current_time = 0;   
+    int queue[100];         
+    int front = 0, rear = 0;
+    
+
+    for (int i = 0; i < n; i++) {
+        if (p[i].at == 0) {
+            queue[rear] = i;
+            rear++;
+        }
+    }
+    
+    while (completed < n) {
+        int current_process;
+        
+        if (front == rear) {
+       
+            int min_arrival = __INT_MAX__;
+            int next_process = -1;
+            
+            for (int i = 0; i < n; i++) {
+                if (p[i].rt > 0 && p[i].at > current_time && p[i].at < min_arrival) {
+                    min_arrival = p[i].at;
+                    next_process = i;
+                }
+            }
+            
+            if (next_process == -1) {
+                break; 
+            }
+            
+            current_time = p[next_process].at;
+            queue[rear] = next_process;
+            rear++;
+        }
+        
+        current_process = queue[front];
+        front++;
+        
+        int execution_time = (p[current_process].rt < tq) ? p[current_process].rt : tq;
+        current_time += execution_time;
+        p[current_process].rt -= execution_time;
+        
+       
+        for (int i = 0; i < n; i++) {
+            if (p[i].rt > 0 && p[i].at <= current_time && i != current_process) {
+            
+                int already_in_queue = 0;
+                for (int j = front; j < rear; j++) {
+                    if (queue[j] == i) {
+                        already_in_queue = 1;
+                        break;
+                    }
+                }
+                
+                if (!already_in_queue) {
+                    queue[rear] = i;
+                    rear++;
+                }
+            }
+        }
+        
+      
+        if (p[current_process].rt > 0) {
+            queue[rear] = current_process;
+            rear++;
+        } else {
+           
+            completed++;
+            p[current_process].ct = current_time;
+            p[current_process].tat = p[current_process].ct - p[current_process].at;
+            p[current_process].wt = p[current_process].tat - p[current_process].tbt;
+        }
+    }
+    
+    printf("\nProcess\tAT\tBT\tCT\tTAT\tWT\n");
+    float total_tat = 0, total_wt = 0;
+    
+    for (int i = 0; i < n; i++) {
+        printf("P%d\t\t%d\t%d\t%d\t%d\t%d\n", 
+               p[i].pid, p[i].at, p[i].tbt, p[i].ct, p[i].tat, p[i].wt);
+        total_tat += p[i].tat;
+        total_wt += p[i].wt;
+    }
+    
+    printf("\nAverage Turnaround Time: %.2f\n", total_tat / n);
+    printf("Average Waiting Time: %.2f\n", total_wt / n);
+    
+    return 0;
+}
+
+Output:
+
+Enter the no. of processes:
+4
+Enter the time quantum:
+2
+Enter the id of the process:
+1 2 3 4
+Enter the arrival time of the process:
+0 1 3 5
+Enter the burst time of the process:
+5 4 2 3
+
+Process AT      BT      CT      TAT     WT
+P1              0       5       13      13      8
+P2              1       4       10      9       5
+P3              3       2       8       5       3
+P4              5       3       14      9       6
+
+Average Turnaround Time: 9.00
+Average Waiting Time: 5.50
