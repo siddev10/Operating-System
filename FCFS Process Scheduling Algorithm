@@ -1,0 +1,145 @@
+code:
+#include<stdio.h>
+struct Process
+{
+    int processID;
+    int arrivalTime;
+    int burstTime;
+    int waitingTime;
+    int turnaroundTime;
+    int completionTime;
+    int responseTime;
+    int startTime;
+};
+void sortProcesses(struct Process p[], int n)
+{
+    struct Process temp;
+    for (int i = 0; i < n - 1; i++)
+    {
+        for (int j = 0; j < n - i - 1; j++)
+        {
+            if (p[j].arrivalTime > p[j + 1].arrivalTime)
+            {
+                temp = p[j];
+                p[j] = p[j + 1];
+                p[j + 1] = temp;
+            }
+        }
+    }
+}
+void printGanttChart(struct Process p[], int n)
+{
+    printf("| ");
+    printf("P%d |", p[0].processID);  
+    for(int i = 1; i < n; i++)
+    {
+        if(p[i-1].completionTime < p[i].arrivalTime)
+        {
+            printf(" Idle |");
+        }
+        printf(" P%d |", p[i].processID);
+    }
+    printf("\n");
+    printf("%d", p[0].arrivalTime);
+    for(int i = 1; i < n; i++)
+    {
+        if(p[i-1].completionTime < p[i].arrivalTime)
+        {
+            printf("     %d", p[i].arrivalTime);  
+        }
+        else
+        {
+            printf("     %d", p[i].completionTime);  
+        }
+    }
+    printf("\n");
+}
+int main()
+{
+    int n;
+    printf("Enter the number of processes\n");
+    scanf("%d", &n);
+    struct Process p[n];
+   
+    for (int i = 0; i < n; i++)
+    {
+        printf("Enter process ID, arrival time, and burst time for process %d\n", i + 1);
+        scanf("%d %d %d", &p[i].processID, &p[i].arrivalTime, &p[i].burstTime);
+    }
+    sortProcesses(p, n);
+    p[0].completionTime = p[0].arrivalTime + p[0].burstTime;
+    for (int i = 1; i < n; i++)
+    {
+        if (p[i].arrivalTime <= p[i - 1].completionTime)
+        {
+            p[i].completionTime = p[i - 1].completionTime + p[i].burstTime;
+        }
+        else
+        {
+            p[i].completionTime = p[i].arrivalTime + p[i].burstTime;
+        }
+    }
+    for (int i = 0; i < n; i++)
+    {
+        if (i == 0)
+        {
+            p[i].startTime = p[i].arrivalTime;
+        }
+        else
+        {
+            if (p[i - 1].completionTime <= p[i].arrivalTime)
+            {
+                p[i].startTime = p[i].arrivalTime;
+            }
+            else
+            {
+                p[i].startTime = p[i - 1].completionTime;
+            }
+        }
+    }
+    for (int i = 0; i < n; i++)
+    {
+        p[i].turnaroundTime = p[i].completionTime - p[i].arrivalTime;
+
+
+        p[i].waitingTime = p[i].turnaroundTime - p[i].burstTime;
+
+
+        p[i].responseTime = p[i].startTime - p[i].arrivalTime;
+    }
+    printf("FCFS algorithm:\n");
+    printf("Process ID\tArrival Time\tBurst Time\tCompletion Time\tTAT\tWT\tRT\n");
+    for (int i = 0; i < n; i++)
+    {
+        printf("%d\t\t%d\t\t%d\t\t%d\t\t%d\t%d\t%d\n",
+            p[i].processID,
+            p[i].arrivalTime,
+            p[i].burstTime,
+            p[i].completionTime,
+            p[i].turnaroundTime,
+            p[i].waitingTime,
+            p[i].responseTime);
+    }
+    printGanttChart(p, n);
+    return 0;
+}
+
+Output:
+Enter the number of processes
+4
+Enter process ID, arrival time, and burst time for process 1
+1 0 5
+Enter process ID, arrival time, and burst time for process 2
+2 1 4
+Enter process ID, arrival time, and burst time for process 3
+3 3 2
+Enter process ID, arrival time, and burst time for process 4
+4 5 3
+FCFS algorithm:
+Process ID      Arrival Time    Burst Time      Completion Time TAT     WT      RT
+1               0               5               5               5       0       0
+2               1               4               9               8       4       4
+3               3               2               11              8       6       6
+4               5               3               14              9       6       6
+| P1 | P2 | P3 | P4 |
+0     9     11     14
