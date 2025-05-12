@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(){
+    int nb, np;
+    printf("Enter number of blocks and process : ");
+    scanf("%d %d", &nb, &np);
+    int b[nb], p[np];
+    int bf[nb], bn[np], frag[np];
+    int big = 0;
+    for(int i = 0; i < nb; i++){
+        printf("Enter block size of %d : ",i+1);
+        scanf("%d",&b[i]);
+        bf[i] = 0;
+    }
+    for(int i = 0; i < np; i++){
+        printf("Enter process size of %d : ",i+1);
+        scanf("%d",&p[i]);
+        bn[i] = frag[i] = 0;
+    }
+    printf("Process No.\tProcess Size\tBlock No.\tBlock Size\tFragmentation\n ");
+
+    for(int i = 0; i<np ; i++){
+        for(int j = 0 ; j<nb; j++){
+            if(b[j] >= p[i] && bf[j]==0){
+                if(b[j]>big){
+                    big = b[j];
+                    bn[i]=j;
+                }
+            }
+        }
+        frag[i] = big - p[i];
+        bf[bn[i]] = 1;
+        big = 0;
+        printf("\t%d\t\t%d\t\t%d\t\t%d\t\t%d\n",i+1,p[i],bn[i]+1,b[bn[i]],frag[i]);
+    }
+    
+}
+
+Output:
+Enter number of blocks and process : 5 4
+Enter block size of 1 : 150
+Enter block size of 2 : 180
+Enter block size of 3 : 100
+Enter block size of 4 : 120
+Enter block size of 5 : 90
+Enter process size of 1 : 60
+Enter process size of 2 : 40
+Enter process size of 3 : 30
+Enter process size of 4 : 20
+Process No.     Process Size    Block No.       Block Size      Fragmentation
+        1               60              2               180             120
+        2               40              1               150             110
+        3               30              4               120             90
+        4               20              3               100             80
