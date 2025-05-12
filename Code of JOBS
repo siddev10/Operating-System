@@ -1,0 +1,142 @@
+OS Lab Assignment 6
+
+1	Assume Hello Students SY B Div   placed in input.txt file. Write a C++ program to read the file line by line and display output on screen.
+Code:
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+int main() {
+   ifstream inputFile("input.txt");
+   if (!inputFile) {
+       cerr << "Error opening the file!" << endl;
+       return 1;
+   }
+   string line;
+   while (getline(inputFile, line)) {
+       cout << line << endl;
+   }
+   inputFile.close();
+   return 0;
+}
+
+Output: 
+ 
+2	Assume the buffer is holding temporary data. Write a C++ program to store lines from input.txt file into a buffer. Also display buffer output on screen.
+Code:
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+int main() {
+   ifstream inputFile("input.txt");
+   if (!inputFile) {
+       cerr << "Error opening the file!" << endl;
+       return 1;
+   }
+   string buffer; 
+   string line;
+   while (getline(inputFile, line)) {
+       buffer = line; 
+       cout << "Buffer Content: " << buffer << endl; 
+   }
+   inputFile.close();
+   return 0;
+}
+
+Output: 
+ 
+3	Assume external memory is 100 by 4. Write a C++ Program to store buffer content into external memory location 00.
+Code:
+#include <iostream>
+#include <string>
+#include <iomanip>
+using namespace std;
+int main() {
+   int externalMemory[100][4] = {0};
+   string buffer = "Hello Student SY B This is OS Lab ";
+   int index = 0;
+   for (int i = 0; i < buffer.size(); i++) {
+       externalMemory[index][i % 4] = buffer[i];
+       if (i % 4 == 3) {
+           index++;
+       }
+   }
+   cout << "External memory locations and their content:\n"; 
+    for (int i = 0; i < 100; i++) {
+       cout << "Location " << setfill('0') << setw(2) << i << ": ";
+       bool empty = true;
+       for (int j = 0; j < 4; j++) {
+           if (externalMemory[i][j] != 0) {
+               cout << (char)externalMemory[i][j] << " ";
+               empty = false;
+           }
+       }
+       if (empty) {
+           cout << "*";
+       }
+       cout << endl;
+   }
+   return 0;
+}
+
+Output:
+ 
+
+4
+Write C++ Program to write content into output.txt file from external memory. Memory block O consist Hello Students SY B Div   data.
+Code:
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <iomanip>
+using namespace std;
+
+int main() {
+   int externalMemory[100][4] = {0};
+   string buffer = "Hello Student SY B This is OS Lab ";
+
+   int index = 0;
+
+   for (int i = 0; i < buffer.size(); i++) {
+       externalMemory[index][i % 4] = buffer[i];
+       if (i % 4 == 3) {
+           index++;
+       }
+   }
+
+   ofstream outFile("output.txt");
+
+   if (!outFile) {
+       cout << "Error opening file for writing!" << endl;
+       return 1;
+   }
+
+   outFile << "External memory locations and their content:\n";
+
+   for (int i = 0; i < 100; i++) {
+       outFile << "Location " << setfill('0') << setw(2) << i << ": ";
+       bool empty = true;
+       for (int j = 0; j < 4; j++) {
+           if (externalMemory[i][j] != 0) {
+               outFile << (char)externalMemory[i][j] << " ";
+               empty = false;
+           }
+       }
+       if (empty) {
+           outFile << "* * * *";
+       }
+       outFile << endl;
+   }
+
+   outFile.close();
+
+   cout << "Data has been written to output.txt" << endl;
+
+   return 0;
+}
+
+
+Output:
+ 
+
